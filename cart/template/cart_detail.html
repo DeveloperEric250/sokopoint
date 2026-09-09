@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - SokoPoint{% endblock %}
+
+{% block extra_css %}
+.cart-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.cart-table thead {
+    background: var(--primary-50);
+}
+
+.cart-table th {
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary-dark);
+}
+
+.cart-table td {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-light);
+    vertical-align: middle;
+}
+
+.cart-product {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.cart-product-img {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    background: #f3f4f6;
+    flex-shrink: 0;
+}
+
+.cart-product-name {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.cart-product-vendor {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.qty-control {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--border-light);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    width: fit-content;
+}
+
+.qty-control button {
+    background: none;
+    border: none;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qty-control button:hover {
+    background: var(--primary-100);
+    color: var(--primary);
+}
+
+.qty-control .qty-value {
+    width: 40px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: white;
+    height: 36px;
+    line-height: 36px;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+}
+
+.cart-price {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.cart-total-price {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.cart-remove-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.cart-remove-btn:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+.cart-summary {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+    margin-top: 24px;
+}
+
+.cart-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--border);
+}
+
+.cart-summary-row:last-child {
+    border-bottom: none;
+    padding-top: 16px;
+    font-size: 1.2rem;
+}
+
+.cart-summary-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.cart-summary-value {
+    font-weight: 700;
+    color: var(--text);
+}
+
+.cart-summary-total {
+    color: var(--primary) !important;
+    font-size: 1.3rem;
+}
+
+.cart-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    gap: 16px;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 80px 20px;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.empty-cart-icon {
+    width: 80px;
+    height: 80px;
+    color: var(--primary-200);
+    margin: 0 auto 20px;
+}
+
+.empty-cart h3 {
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.empty-cart p {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+    .cart-table thead { display: none; }
+    .cart-table, .cart-table tbody, .cart-table tr, .cart-table td {
+        display: block;
+        width: 100%;
+    }
+    .cart-table tr {
+        padding: 16px;
+        border-bottom: 1px solid var(--border-light);
+    }
+    .cart-table td {
+        padding: 6px 0;
+        border: none;
+        text-align: right;
+    }
+    .cart-table td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+    }
+    .cart-table td:first-child { text-align: left; }
+    .cart-product { justify-content: flex-start; }
+    .cart-actions { flex-direction: column; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <div class="page-header">
+        <h1>🛒 Shopping Cart</h1>
+        <p>{% if cart.get_total_items > 0 %}{{ cart.get_total_items }} item{{ cart.get_total_items|pluralize }} in your cart{% else %}Your cart is empty{% endif %}</p>
+    </div>
+
+    {% if cart.get_total_items > 0 %}
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart %}
+                <tr>
+                    <td data-label="Product">
+                        <div class="cart-product">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="cart-product-img">
+                            {% else %}
+                                <div class="cart-product-img" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.7rem;">No img</div>
+                            {% endif %}
+                            <div>
+                                <div class="cart-product-name">{{ item.product.name }}</div>
+                                <div class="cart-product-vendor">by {{ item.product.vendor.username }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Price">
+                        <span class="cart-price">${{ item.price }}</span>
+                    </td>
+                    <td data-label="Quantity">
+                        <div class="qty-control">
+                            <form method="post" action="{% url 'add_to_cart' item.product.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="{{ item.quantity|add:'-1' }}">
+                                <input type="hidden" name="override" value="true">
+                                <button type="submit" {% if item.quantity <= 1 %}disabled{% endif %}>−</button>
+                            </form>
+                            <div class="qty-value">{{ item.quantity }}</div>
+                            <form method="post" action="{% url 'add_to_cart' item.product.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="{{ item.quantity|add:'1' }}">
+                                <input type="hidden" name="override" value="true">
+                                <button type="submit">+</button>
+                            </form>
+                        </div>
+                    </td>
+                    <td data-label="Total">
+                        <span class="cart-total-price">${{ item.total_price }}</span>
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="cart-remove-btn" title="Remove">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="cart-summary">
+            <div class="cart-summary-row">
+                <span class="cart-summary-label">Items</span>
+                <span class="cart-summary-value">{{ cart.get_total_items }}</span>
+            </div>
+            <div class="cart-summary-row">
+                <span class="cart-summary-label" style="font-size:1.1rem;font-weight:700;color:var(--text);">Grand Total</span>
+                <span class="cart-summary-value cart-summary-total">${{ cart.get_total_price }}</span>
+            </div>
+        </div>
+
+        <div class="cart-actions">
+            <a href="{% url 'customer_dashboard' %}" class="btn btn-secondary">← Continue Shopping</a>
+            <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg">Proceed to Checkout →</a>
+        </div>
+
+    {% else %}
+        <div class="empty-cart">
+            <svg class="empty-cart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+            <h3>Your cart is empty</h3>
+            <p>Looks like you haven't added any products yet.</p>
+            <a href="{% url 'customer_dashboard' %}" class="btn btn-primary">Browse Products</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Product - SokoPoint{% endblock %}
+
+{% block extra_css %}
+.form-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow);
+}
+.form-container h1 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+}
+.form-container input, .form-container select, .form-container textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: white;
+}
+.form-container input:focus, .form-container select:focus, .form-container textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+.form-container label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: var(--text);
+}
+.form-container textarea {
+    min-height: 120px;
+}
+/* Style file input */
+.form-container input[type="file"] {
+    padding: 10px;
+    background: #f8fafc;
+}
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Edit Product: {{ product.name }}</h1>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {{ form.as_p }}
+        
+        <div class="flex gap-2 mt-3">
+            <a href="{% url 'vendor_dashboard' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update Product</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

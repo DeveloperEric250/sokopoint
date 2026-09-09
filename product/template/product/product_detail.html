@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - SokoPoint{% endblock %}
+
+{% block extra_css %}
+.product-detail-container {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+    .product-detail-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.product-image-large {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    background: #f1f5f9;
+}
+
+.product-info-large h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.product-vendor-large {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.product-price-large {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 24px;
+}
+
+.product-desc-large {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.add-to-cart-box {
+    background: var(--primary-50);
+    padding: 24px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--primary-200);
+}
+
+.add-to-cart-box label {
+    font-weight: 600;
+    color: var(--primary-dark);
+    display: block;
+    margin-bottom: 8px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div>
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image-large">
+        {% else %}
+            <div class="product-image-large" style="display:flex;align-items:center;justify-content:center;height:400px;color:var(--text-muted);">No Image Available</div>
+        {% endif %}
+    </div>
+    
+    <div class="product-info-large">
+        <h1>{{ product.name }}</h1>
+        <div class="product-vendor-large">
+            <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            Sold by <strong>{{ product.vendor.username }}</strong>
+        </div>
+        
+        <div class="product-price-large">{{ product.price }} <span style="font-size:1rem;color:var(--text-muted);font-weight:400;">/ {{ product.unit }}</span></div>
+        
+        <div class="product-desc-large">
+            {{ product.description|linebreaks }}
+        </div>
+        
+        {% if user.user_type != 'vendor' %}
+        <div class="add-to-cart-box">
+            <form method="post" action="{% url 'add_to_cart' product.id %}">
+                {% csrf_token %}
+                <label for="quantity">Quantity</label>
+                <div style="display:flex; gap:16px;">
+                    <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control" style="width: 100px;">
+                    <button type="submit" class="btn btn-primary btn-lg" style="flex:1;">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                        Add to Cart
+                    </button>
+                </div> 
+            </form>
+        </div>
+        {% else %}
+            {% if product.vendor == request.user %}
+            <div class="flex gap-2">
+                <a href="{% url 'edit_product' product.id %}" class="btn btn-primary">Edit Product</a>
+                <a href="{% url 'delete_product' product.id %}" class="btn btn-danger">Delete Product</a>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

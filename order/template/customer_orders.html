@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - SokoPoint{% endblock %}
+
+{% block extra_css %}
+.page-header {
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 16px;
+}
+
+.order-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-light);
+    transition: var(--transition);
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--border);
+}
+
+.order-id {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.order-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    font-weight: 500;
+}
+
+.items-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+}
+
+.items-list li {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.items-list li:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 64px 20px;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>My Orders History</h1>
+</div>
+
+{% if orders %}
+    {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <div class="order-id">Order #{{ order.id }}</div>
+                <div class="badge badge-{{ order.status|lower }}">{{ order.status }}</div>
+            </div>
+            
+            <div class="order-details">
+                <div class="detail-item">
+                    <span class="detail-label">Total Amount</span>
+                    <span class="detail-value" style="font-size: 1.2rem; color: var(--primary);">${{ order.total_amount }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Date Placed</span>
+                    <span class="detail-value">{{ order.created_at|date:"M d, Y H:i" }}</span>
+                </div>
+                <div class="detail-item" style="grid-column: span 2;">
+                    <span class="detail-label">District</span>
+                    <span class="detail-value">{{ order.get_district_display }}</span>
+                </div>
+                <div class="detail-item" style="grid-column: span 2;">
+                    <span class="detail-label">Delivery Address</span>
+                    <span class="detail-value">{{ order.delivery_address }}</span>
+                </div>
+            </div>
+
+            <div class="detail-label" style="margin-bottom: 8px;">Order Items</div>
+            <ul class="items-list">
+                {% for item in order.order_items.all %}
+                    <li>
+                        <span><strong>{{ item.product.name }}</strong> (x{{ item.quantity }})</span>
+                        <span>{{ item.price }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <svg class="icon-lg text-muted mb-2" style="width: 64px; height: 64px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+        <h3 class="mb-2">You haven't placed any orders yet.</h3>
+        <a href="{% url 'customer_dashboard' %}" class="btn btn-primary">Browse Products</a>
+    </div>
+{% endif %}
+{% endblock %}

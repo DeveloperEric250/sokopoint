@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}All Products - SokoPoint{% endblock %}
+
+{% block extra_css %}
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+.page-header h1 {
+    font-size: 2rem;
+    color: var(--text);
+}
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+}
+.product-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+}
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+.product-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+    background: #f3f4f6;
+}
+.product-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text);
+}
+.product-vendor {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+.product-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 16px;
+}
+.product-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>All Products</h1>
+</div>
+
+<div class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <a href="{% url 'product_detail' product.id %}">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+            {% else %}
+                <div class="product-img" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);">No Image</div>
+            {% endif %}
+        </a>
+        <div class="product-info">
+            <a href="{% url 'product_detail' product.id %}"><div class="product-title">{{ product.name }}</div></a>
+            <div class="product-vendor">Vendor: {{ product.vendor.username }}</div>
+            <div class="product-price">{{ product.price }}</div>
+            <div class="product-actions">
+                {% if user.user_type != 'vendor' %}
+                    <form method="post" action="{% url 'add_to_cart' product.id %}" style="flex:1;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-block">Add to Cart</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'product_detail' product.id %}" class="btn btn-secondary btn-block">View Details</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: white; border-radius: var(--radius); box-shadow: var(--shadow);">
+        <p class="text-muted">No products available at the moment.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

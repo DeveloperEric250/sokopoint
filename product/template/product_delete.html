@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Product - SokoPoint{% endblock %}
+
+{% block extra_css %}
+.delete-container {
+    max-width: 500px;
+    margin: 40px auto;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    border-top: 4px solid var(--danger);
+}
+.delete-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--danger-light);
+    color: var(--danger);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 24px;
+}
+.delete-container h1 {
+    font-size: 1.5rem;
+    color: var(--text);
+    margin-bottom: 12px;
+}
+.delete-container p {
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    font-size: 1.1rem;
+}
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <div class="delete-icon">
+        <svg class="icon-lg" style="width: 32px; height: 32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+    </div>
+    
+    <h1>Delete Product</h1>
+    <p>Are you sure you want to delete <strong>{{ product.name }}</strong>? This action cannot be undone.</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div class="flex gap-2" style="justify-content: center;">
+            <a href="{% url 'vendor_dashboard' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

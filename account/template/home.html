@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}SokoPoint - Your Premium Marketplace{% endblock %}
+
+{% block extra_css %}
+.hero {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, var(--primary-50) 0%, #fff 100%);
+    border-radius: var(--radius);
+    margin-bottom: 40px;
+}
+.hero h1 {
+    font-size: 3rem;
+    color: var(--primary-dark);
+    margin-bottom: 16px;
+}
+.hero p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 32px;
+}
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+.section-title {
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 32px;
+}
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+}
+.product-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: var(--transition);
+}
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+.product-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+    background: #f3f4f6;
+}
+.product-info {
+    padding: 20px;
+}
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+.product-vendor {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+.product-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 16px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Welcome to SokoPoint</h1>
+    <p>Discover amazing products from premium vendors. Fast delivery, secure payments, and a seamless shopping experience.</p>
+    <div class="hero-buttons">
+        <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">Shop Now</a>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'vendor_register' %}" class="btn btn-secondary btn-lg">Become a Vendor</a>
+        {% endif %}
+    </div>
+</div>
+
+<h2 class="section-title">Featured Products</h2>
+<div class="product-grid">
+    {% for product in products|slice:":8" %}
+    <div class="product-card">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+        {% else %}
+            <div class="product-img" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);">No Image</div>
+        {% endif %}
+        <div class="product-info">
+            <div class="product-title">{{ product.name }}</div>
+            <div class="product-vendor">by {{ product.vendor.username }}</div>
+            <div class="product-price">${{ product.price }}</div>
+            <form method="post" action="{% url 'add_to_cart' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-block">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+    {% empty %}
+    <p style="text-align:center;grid-column:1/-1;color:var(--text-muted);">No products available yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}
