@@ -1,6 +1,8 @@
 # SokoPoint — 20-Day Development Workflow
 
 > **Project:** SokoPoint — Multi-vendor E-commerce Platform (Django)  
+> **Institution:** Solvit (Individual Project)  
+> **Developer:** NSABIMANA Eric  
 > **Timeline:** 20 working days (4 sprints × 5 days)  
 > **Start Date:** September 10, 2026  
 > **End Date:** October 7, 2026  
