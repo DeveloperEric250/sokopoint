@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from product.models import Product
+# pyrefly: ignore [missing-import]
 from .cart import Cart
 
 
