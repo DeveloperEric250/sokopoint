@@ -186,13 +186,13 @@
                         {{ item.product.name }}
                         <span class="summary-item-qty">Qty: {{ item.quantity }}</span>
                     </div>
-                    <div class="summary-item-price">${{ item.total_price }}</div>
+                    <div class="summary-item-price">{{ item.total_price }}</div>
                 </div>
                 {% endfor %}
                 
                 <div class="summary-total">
                     <span class="total-label">Total to Pay</span>
-                    <span class="total-value">${{ cart.get_total_price }}</span>
+                    <span class="total-value">{{ cart.get_total_price }}</span>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-block btn-lg mt-3">

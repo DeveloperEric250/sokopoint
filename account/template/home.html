@@ -99,7 +99,7 @@
         <div class="product-info">
             <div class="product-title">{{ product.name }}</div>
             <div class="product-vendor">by {{ product.vendor.username }}</div>
-            <div class="product-price">${{ product.price }}</div>
+            <div class="product-price">{{ product.price }}</div>
             <form method="post" action="{% url 'add_to_cart' product.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary btn-block">Add to Cart</button>

@@ -266,7 +266,7 @@
                         </div>
                     </td>
                     <td data-label="Price">
-                        <span class="cart-price">${{ item.price }}</span>
+                        <span class="cart-price">{{ item.price }}</span>
                     </td>
                     <td data-label="Quantity">
                         <div class="qty-control">
@@ -286,7 +286,7 @@
                         </div>
                     </td>
                     <td data-label="Total">
-                        <span class="cart-total-price">${{ item.total_price }}</span>
+                        <span class="cart-total-price">{{ item.total_price }}</span>
                     </td>
                     <td>
                         <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
@@ -308,7 +308,7 @@
             </div>
             <div class="cart-summary-row">
                 <span class="cart-summary-label" style="font-size:1.1rem;font-weight:700;color:var(--text);">Grand Total</span>
-                <span class="cart-summary-value cart-summary-total">${{ cart.get_total_price }}</span>
+                <span class="cart-summary-value cart-summary-total">{{ cart.get_total_price }}</span>
             </div>
         </div>
 

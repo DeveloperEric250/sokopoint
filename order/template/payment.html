@@ -51,7 +51,7 @@
     <div class="payment-card">
         <div class="payment-header">
             <h2 style="font-size: 1.1rem; color: var(--text-secondary); font-weight: 500;">Amount due for Order #{{ order.id }}</h2>
-            <div class="payment-amount">${{ payment.amount }}</div>
+            <div class="payment-amount">{{ payment.amount }}</div>
             <div class="payment-method-badge">
                 {% if payment.payment_method == 'CARD' %}
                     💳 Credit / Debit Card
