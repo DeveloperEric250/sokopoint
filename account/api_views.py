@@ -1,52 +1,101 @@
-from django.contrib.auth import login, logout
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from django.contrib.auth import get_user_model
+from rest_framework import generics, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import CustomUserSerializer, LoginSerializer
+from .serializers import ChangePasswordSerializer, CustomUserSerializer, LoginSerializer
+
+User = get_user_model()
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def api_register(request):
-    serializer = CustomUserSerializer(data=request.data)
-    if serializer.is_valid():
+def _jwt_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+
+
+class RegisterAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = CustomUserSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         user = serializer.save()
-        return Response(CustomUserSerializer(user).data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        tokens = _jwt_tokens_for_user(user)
+        return Response(
+            {
+                'user': CustomUserSerializer(user).data,
+                'tokens': tokens,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
-@api_view(['GET', 'PUT', 'PATCH'])
-@permission_classes([IsAuthenticated])
-def api_profile(request):
-    if request.method == 'GET':
-        return Response(CustomUserSerializer(request.user).data) 
+class LoginAPIView(APIView):
+    permission_classes = [AllowAny]
 
-    serializer = CustomUserSerializer(
-        request.user,
-        data=request.data,
-        partial=request.method == 'PATCH',
-    )
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, *args, **kwargs):
+        serializer = LoginSerializer(data=request.data, context={'request': request})
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def api_login(request):
-    serializer = LoginSerializer(data=request.data, context={'request': request})
-    if serializer.is_valid():
         user = serializer.validated_data['user']
-        login(request, user)
-        return Response(CustomUserSerializer(user).data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(_jwt_tokens_for_user(user), status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def api_logout(request):
-    logout(request)
-    return Response(status=status.HTTP_204_NO_CONTENT)
+class UserProfileAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
+class ChangePasswordAPIView(generics.GenericAPIView):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={'request': request})
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+        return Response({'detail': 'Password changed successfully.'}, status=status.HTTP_200_OK)
+
+
+class LogoutAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        return Response({'detail': 'User logged out successfully.'}, status=status.HTTP_200_OK)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)
+
+    @action(detail=False, methods=['get'], url_path='me')
+    def me(self, request, *args, **kwargs):
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+
+
+api_register = RegisterAPIView.as_view()
+api_login = LoginAPIView.as_view()
+api_profile = UserProfileAPIView.as_view()
+api_logout = LogoutAPIView.as_view()
+change_password = ChangePasswordAPIView.as_view()
